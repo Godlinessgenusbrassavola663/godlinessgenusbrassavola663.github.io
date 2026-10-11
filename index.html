@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ptonk</title>
+  <style>
+    :root {
+      --soil: #2b2118;
+      --panel: #3a2c20;
+      --line: #6b553c;
+      --ink: #f4ead8;
+      --muted: #c9b89c;
+      --accent: #f0c24b;
+      --leaf: #4f8a3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 20% 10%, #4a3a2a 0, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, #3f2f20 0, transparent 55%),
+        var(--soil);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+    }
+    main { width: 100%; max-width: 36rem; }
+    h1 { margin: 0 0 1.5rem; font-size: 2.2rem; color: var(--accent); letter-spacing: 0.04em; }
+    h2 { margin: 0 0 0.6rem; font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    a.game {
+      display: block;
+      padding: 1rem 1.2rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    a.game:hover, a.game:focus-visible { border-color: var(--leaf); transform: translateY(-2px); }
+    a.game strong { display: block; font-size: 1.4rem; color: var(--accent); }
+    a.game span { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ptonk</h1>
+    <h2>Games</h2>
+    <a class="game" href="mandible/">
+      <strong>Mandible</strong>
+      <span>Ant-colony real-time strategy in the browser · 1v1, 2v2 and Free-for-all · against the AI or online</span>
+    </a>
+  </main>
+</body>
+</html>
