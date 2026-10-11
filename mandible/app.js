@@ -85,14 +85,58 @@ function field(item) {
   return wrap;
 }
 
+// A select with no label of its own, for a table cell.
+function bareSelect(item) {
+  const input = make("select");
+  item.options.forEach((o) => {
+    const opt = make("option", "", o.text);
+    opt.value = o.value;
+    input.append(opt);
+  });
+  input.value = item.value;
+  input.id = item.id;
+  input.addEventListener("change", () => send(item.id, input.value));
+  return input;
+}
+
+// A table with a head row; each cell is text or an item (a select, a button).
+function table(item) {
+  const box = make("table", "cells");
+  const head = make("tr");
+  item.head.forEach((h) => {
+    const th = make("th", "", h);
+    if (hints[h]) th.dataset.term = h;
+    head.append(th);
+  });
+  box.append(head);
+  item.rows.forEach((r) => {
+    const tr = make("tr");
+    r.forEach((cell) => {
+      const td = make("td");
+      if (typeof cell === "string") td.textContent = cell;
+      else td.append(cell.bare ? bareSelect(cell) : element(cell));
+      tr.append(td);
+    });
+    box.append(tr);
+  });
+  return box;
+}
+
 function element(item) {
   if (item.type === "button") {
-    const b = make("button", "button", item.text);
+    const b = make("button", "button" + (item.active ? " active" : ""), item.text);
     b.type = "button";
     b.id = item.id;
-    b.addEventListener("click", () => send(item.id, ""));
+    b.disabled = item.disabled === true;
+    if (item.term && hints[item.term]) b.dataset.term = item.term;
+    b.addEventListener("click", () => {
+      // Copy: the core gives the text; putting it on the clipboard is the page's job.
+      if (item.copy !== undefined && navigator.clipboard) navigator.clipboard.writeText(item.copy).catch(() => {});
+      send(item.id, "");
+    });
     return b;
   }
+  if (item.type === "table") return table(item);
   if (item.type === "list") return pairs(item.rows);
   if (item.type === "toggles") {
     const wrap = make("div", "field");
@@ -109,6 +153,26 @@ function element(item) {
     });
     wrap.classList.add("toggles-field");
     wrap.append(make("label", "", item.label), box);
+    return wrap;
+  }
+  if (item.type === "slider") {
+    // The core gives the range and step; the page only shows them. The
+    // value is sent when the slider is released, so a redraw never ends
+    // a drag.
+    const wrap = make("div", "field slider");
+    const label = make("label", "", item.label);
+    if (hints[item.label]) label.dataset.term = item.label;
+    const input = make("input");
+    input.type = "range";
+    input.id = item.id;
+    input.setAttribute("min", item.min);
+    input.setAttribute("max", item.max);
+    input.setAttribute("step", item.step);
+    input.value = item.value;
+    const shown = make("span", "slider-value", item.text);
+    input.addEventListener("change", () => send(item.id, input.value));
+    label.htmlFor = item.id;
+    wrap.append(label, input, shown);
     return wrap;
   }
   if (item.type === "keybind") {
@@ -228,8 +292,11 @@ function drawBar(m) {
     }
   });
   sync(el("queue"), m.queue, (q) => q.key, newQueueItem, (item, q) => {
-    const [img, count, fill] = item.children;
+    const [img, rank, short, count, fill] = item.children;
+    setClass(item, "qitem " + q.kind);
     setIcon(img, q.icon);
+    setText(rank, q.rank);
+    setText(short, q.short);
     setText(count, q.count);
     fill.style.width = q.progress;
     if (tipAnchor === item) showTip(q.label, q.rows, item);
@@ -249,7 +316,7 @@ function drawBar(m) {
 function newQueueItem() {
   const item = make("button", "qitem");
   item.type = "button";
-  item.append(iconImage(""), make("span", "count"), make("span", "fill"));
+  item.append(iconImage(""), make("span", "rank"), make("span", "short"), make("span", "count"), make("span", "fill"));
   item.addEventListener("click", () => send(item.item.id, ""));
   item.addEventListener("mouseenter", () => showTip(item.item.label, item.item.rows, item));
   item.addEventListener("mouseleave", hideTip);
@@ -328,9 +395,74 @@ function drawOverlay(m) {
   if (box.title) panel.append(make("h2", "", box.title));
   if (box.heading) panel.append(make("h2", "", box.heading));
   if (box.rows) panel.append(pairs(box.rows));
+  if (box.graph) {
+    panel.classList.add("end");
+    panel.append(endBody(box));
+  }
   const buttons = box.items || [box.button];
   buttons.forEach((b) => panel.append(element(b)));
   overlay.append(panel);
+}
+
+// ---- the end screen: graph tabs, the core's graph, every colony's summary ----
+
+// SVG nodes are made in the namespace of index.html's graph template, so
+// the page names no URL.
+function svgNode(tag, attrs) {
+  const ns = el("graph-template").content.firstElementChild.namespaceURI;
+  const node = document.createElementNS(ns, tag);
+  Object.keys(attrs).forEach((k) => node.setAttribute(k, attrs[k]));
+  return node;
+}
+
+function endBody(box) {
+  const body = make("div", "end-body");
+  const left = make("div", "end-graph");
+  const tabs = make("div", "end-tabs");
+  box.tabs.forEach((t) => {
+    const b = make("button", "tab" + (t.active ? " active" : ""), t.text);
+    b.type = "button";
+    b.id = t.id;
+    if (hints[t.text]) b.dataset.term = t.text;
+    b.addEventListener("click", () => send(t.id, ""));
+    tabs.append(b);
+  });
+  const g = box.graph;
+  const svg = svgNode("svg", { viewBox: g.view_box, width: g.width, height: g.height, class: "graph" });
+  svg.append(svgNode("path", { d: g.grid, class: "graph-grid" }));
+  svg.append(svgNode("path", { d: g.axis, class: "graph-axis" }));
+  g.lines.forEach((l) => svg.append(svgNode("path", { d: l.d, stroke: l.colour, class: "graph-line" })));
+  g.labels.forEach((l) => {
+    const t = svgNode("text", { x: l.x, y: l.y, "text-anchor": l.anchor, class: "graph-label" });
+    t.textContent = l.text;
+    svg.append(t);
+  });
+  left.append(tabs, make("h3", "", g.title), svg);
+  body.append(left, summaryTable(box));
+  return body;
+}
+
+function summaryTable(box) {
+  const table = make("table", "pairs summary");
+  const head = make("tr");
+  head.append(make("td"));
+  box.columns.forEach((c) => {
+    const th = make("th");
+    const swatch = make("span", "swatch");
+    swatch.style.background = c.colour;
+    th.append(swatch, make("span", "", c.text));
+    head.append(th);
+  });
+  table.append(head);
+  box.summary.forEach((r) => {
+    const tr = make("tr");
+    const label = make("td", "", r.label);
+    if (hints[r.label]) label.dataset.term = r.label;
+    tr.append(label);
+    r.values.forEach((v) => tr.append(make("td", "", v)));
+    table.append(tr);
+  });
+  return table;
 }
 
 // ---- tooltips and term hints ----
@@ -399,7 +531,12 @@ function bindInput() {
   ["keydown", "keyup"].forEach((type) => {
     window.addEventListener(type, (e) => {
       if (typing(e)) return;
-      if (ui && ui.screen === "match" && !e.ctrlKey) e.preventDefault();
+      // In a match, and while Keybinds waits for a key, keys such as Tab
+      // (All Ants), Space and Enter never move focus or press a button.
+      if (ui && (ui.screen === "match" || ui.keys_captured) && !e.ctrlKey) e.preventDefault();
+      // Space presses a focused button when it comes back up: the key just
+      // bound must not press its Keybinds button again.
+      if (ui && ui.keys_captured && document.activeElement) document.activeElement.blur();
       if (e.altKey) e.preventDefault();
       if (e.repeat) return;
       game.key(e.code, type === "keydown", e.ctrlKey || e.altKey || e.metaKey, e.shiftKey);
@@ -525,6 +662,49 @@ function flushNet() {
   });
 }
 
+// ---- sound: the core makes every sound (WAV bytes); the page only plays ----
+
+let audio = null;
+let buffers = {};
+let buffersVolume = null;
+
+// Browsers allow sound only after the person's first click or key press.
+function wakeAudio() {
+  if (!audio) {
+    try {
+      audio = new AudioContext();
+    } catch (e) {
+      audio = null;
+    }
+  } else if (audio.state === "suspended") {
+    audio.resume();
+  }
+}
+window.addEventListener("pointerdown", wakeAudio, true);
+window.addEventListener("keydown", wakeAudio, true);
+
+async function play(key) {
+  if (!audio) return;
+  if (buffersVolume !== ui.volume) {
+    buffers = {};
+    buffersVolume = ui.volume;
+  }
+  try {
+    if (!buffers[key]) {
+      const bytes = game.sound(key);
+      if (!bytes.length) return;
+      buffers[key] = await audio.decodeAudioData(bytes.slice().buffer);
+    }
+    const source = audio.createBufferSource();
+    source.buffer = buffers[key];
+    source.connect(audio.destination);
+    source.start();
+    document.body.dataset.sound = key;
+  } catch (e) {
+    // A sound that cannot play is skipped; the game goes on.
+  }
+}
+
 // ---- the loop ----
 
 function refresh() {
@@ -542,7 +722,12 @@ function refresh() {
     writeStore("player", ui.save.player);
   }
   if (ui.navigate) window.location.href = ui.navigate;
-  if (ui.net_requests) ui.net_requests.forEach(netRequest);
+  if (ui.sounds) ui.sounds.forEach(play);
+  // Messages first: a Leave or Dissolve goes out before the transport closes.
+  if (ui.net_requests) {
+    flushNet();
+    ui.net_requests.forEach(netRequest);
+  }
   const inMatch = ui.screen === "match";
   const starting = inMatch && el("match").hidden;
   el("menus").hidden = inMatch;

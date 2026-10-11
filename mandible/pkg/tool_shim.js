@@ -368,6 +368,18 @@ export class Game {
         wasm.game_resize(this.__wbg_ptr, w, h);
     }
     /**
+     * @param {string} key
+     * @returns {Uint8Array}
+     */
+    sound(key) {
+        const ptr0 = passStringToWasm0(key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.game_sound(this.__wbg_ptr, ptr0, len0);
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v2;
+    }
+    /**
      * @returns {Uint8Array}
      */
     terrain() {
