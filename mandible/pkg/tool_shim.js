@@ -391,6 +391,24 @@ export class Game {
     /**
      * @returns {Int32Array}
      */
+    terrain_patch() {
+        const ret = wasm.game_terrain_patch(this.__wbg_ptr);
+        var v1 = getArrayI32FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * @returns {Uint8Array}
+     */
+    terrain_patch_pixels() {
+        const ret = wasm.game_terrain_patch_pixels(this.__wbg_ptr);
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
+     * @returns {Int32Array}
+     */
     terrain_size() {
         const ret = wasm.game_terrain_size(this.__wbg_ptr);
         var v1 = getArrayI32FromWasm0(ret[0], ret[1]).slice();
@@ -427,6 +445,86 @@ export class Game {
     }
 }
 if (Symbol.dispose) Game.prototype[Symbol.dispose] = Game.prototype.free;
+
+/**
+ * The Menu Background of one screen: its ground image, painted once, and
+ * its draw list for a view size in whole pixels.
+ */
+export class MenuBackground {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        MenuBackgroundFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_menubackground_free(ptr, 0);
+    }
+    /**
+     * @param {number} view_w
+     * @param {number} view_h
+     * @returns {Int32Array}
+     */
+    draw(view_w, view_h) {
+        const ret = wasm.menubackground_draw(this.__wbg_ptr, view_w, view_h);
+        var v1 = getArrayI32FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * @returns {number}
+     */
+    height() {
+        const ret = wasm.menubackground_height(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {Uint8Array}
+     */
+    image() {
+        const ret = wasm.menubackground_image(this.__wbg_ptr);
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
+     * @param {string} screen
+     */
+    constructor(screen) {
+        const ptr0 = passStringToWasm0(screen, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.menubackground_new(ptr0, len0);
+        this.__wbg_ptr = ret;
+        MenuBackgroundFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @returns {number}
+     */
+    width() {
+        const ret = wasm.menubackground_width(this.__wbg_ptr);
+        return ret;
+    }
+}
+if (Symbol.dispose) MenuBackground.prototype[Symbol.dispose] = MenuBackground.prototype.free;
+
+/**
+ * The Menu Background's palette, as JSON text (TRIAGE row 89).
+ * @returns {string}
+ */
+export function menu_palette() {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const ret = wasm.menu_palette();
+        deferred1_0 = ret[0];
+        deferred1_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+}
 
 /**
  * The draw list's assets (op codes, palette, shapes, scales) as JSON text.
@@ -472,6 +570,9 @@ const BenchFinalization = (typeof FinalizationRegistry === 'undefined')
 const GameFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_game_free(ptr, 1));
+const MenuBackgroundFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_menubackground_free(ptr, 1));
 
 function getArrayI32FromWasm0(ptr, len) {
     ptr = ptr >>> 0;

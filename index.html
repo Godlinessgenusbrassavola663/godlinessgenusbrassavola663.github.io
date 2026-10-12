@@ -33,14 +33,25 @@
     h2 { margin: 0 0 0.6rem; font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
     a.game {
       display: block;
-      padding: 1rem 1.2rem;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 12px;
       color: var(--ink);
       text-decoration: none;
+      overflow: hidden;
+      padding: 0;
       transition: border-color 0.15s, transform 0.15s;
     }
+    a.game img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 990 / 557;
+      object-fit: cover;
+      border-bottom: 1px solid var(--line);
+      background: var(--soil);
+    }
+    a.game .text { display: block; padding: 1rem 1.2rem; }
     a.game:hover, a.game:focus-visible { border-color: var(--leaf); transform: translateY(-2px); }
     a.game strong { display: block; font-size: 1.4rem; color: var(--accent); }
     a.game span { color: var(--muted); }
@@ -51,9 +62,17 @@
     <h1>ptonk</h1>
     <h2>Games</h2>
     <a class="game" href="mandible/">
-      <strong>Mandible</strong>
-      <span>Ant-colony real-time strategy in the browser · 1v1, 2v2 and Free-for-all · against the AI or online</span>
+      <img id="mandible-shot" src="img/mandible/battle-01.webp" width="990" height="557" alt="An ant battle in Mandible">
+      <span class="text">
+        <strong>Mandible</strong>
+        <span>Ant-colony real-time strategy in the browser · 1v1, 2v2 and Free-for-all · against the AI or online</span>
+      </span>
     </a>
   </main>
+  <script>
+    // A different battle on each visit.
+    const n = Math.floor(Math.random() * 12) + 1;
+    document.getElementById("mandible-shot").src = "img/mandible/battle-" + String(n).padStart(2, "0") + ".webp";
+  </script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 // The page draws what the core returns and decides nothing. It builds the
 // DOM from the core's view model (ui()), forwards keyboard, mouse and
-// transport events, and keeps the two settings strings in browser storage.
-import init, { Game, render_assets } from "./pkg/tool_shim.js";
+// transport events, and keeps the core's settings and Match History text in
+// browser storage.
+import init, { Game, MenuBackground, menu_palette, render_assets } from "./pkg/tool_shim.js";
 import { createRenderer } from "./render.js";
 
 const el = (id) => document.getElementById(id);
@@ -61,6 +62,7 @@ function field(item) {
   if (hints[item.label]) label.dataset.term = item.label;
   let input;
   if (item.type === "select") {
+    wrap.classList.add("select-field");
     input = make("select");
     item.options.forEach((o) => {
       const opt = make("option", "", o.text);
@@ -82,6 +84,38 @@ function field(item) {
   input.id = item.id;
   label.htmlFor = item.id;
   wrap.append(label, input);
+  return wrap;
+}
+
+// A Room Code and its Copy button in one bordered group: the code is an
+// input when `item.input` names one, else plain text. The core says when the
+// button reads Copied.
+function copyField(item) {
+  const wrap = make("div", "field copy-field");
+  const label = make("label", "", item.label);
+  const group = make("div", "copy-group");
+  let code;
+  if (item.input) {
+    code = make("input");
+    code.id = item.input;
+    code.value = item.value;
+    code.addEventListener("input", () => send(item.input, code.value));
+    label.htmlFor = item.input;
+  } else {
+    code = make("span", "copy-code", item.value);
+    code.id = item.id + ".code";
+  }
+  const b = make("button", "button copy" + (item.copied ? " active" : ""), item.text);
+  b.type = "button";
+  b.id = item.id;
+  b.disabled = item.disabled === true;
+  b.addEventListener("click", () => {
+    // Copy: the core gives the text; putting it on the clipboard is the page's job.
+    if (navigator.clipboard) navigator.clipboard.writeText(item.copy).catch(() => {});
+    send(item.id, "");
+  });
+  group.append(code, b);
+  wrap.append(label, group);
   return wrap;
 }
 
@@ -137,7 +171,12 @@ function element(item) {
     return b;
   }
   if (item.type === "table") return table(item);
-  if (item.type === "list") return pairs(item.rows);
+  if (item.type === "list") {
+    const list = pairs(item.rows);
+    if (item.id) list.id = item.id;
+    return list;
+  }
+  if (item.type === "copy") return copyField(item);
   if (item.type === "toggles") {
     const wrap = make("div", "field");
     const box = make("div", "toggles");
@@ -582,6 +621,30 @@ function resize() {
   mini.width = mini.clientWidth;
   mini.height = mini.clientWidth;
   fogStamp = null;
+  if (ui && ui.screen !== "match") drawMenuBackground(true);
+}
+
+// ---- the menu background (TRIAGE row 89): still; the core paints its
+// image once per screen, and its draw list again only on resize ----
+
+let menuBackground = null;
+let menuPainter = null;
+let menuScreen = "";
+
+function drawMenuBackground(again) {
+  const canvas = el("menu-background");
+  if (!menuPainter) menuPainter = createRenderer(canvas, { ...assets, palette: JSON.parse(menu_palette()) });
+  if (menuScreen !== ui.screen) {
+    if (menuBackground) menuBackground.free();
+    menuBackground = new MenuBackground(ui.screen);
+    menuPainter.setImage(assets.images.terrain, menuBackground.width(), menuBackground.height(), menuBackground.image());
+    menuScreen = ui.screen;
+  } else if (!again) {
+    return;
+  }
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  menuPainter.draw(menuBackground.draw(canvas.width, canvas.height));
 }
 
 // ---- drawing: the core lays out every frame; the page replays it ----
@@ -615,9 +678,11 @@ function drawMatch() {
     lastText = "";
     const size = game.terrain_size();
     renderer.setImage(assets.images.terrain, size[0], size[1], game.terrain());
-    terrainStamp = ts;
+    terrainStamp = game.terrain_stamp();
     resize();
   }
+  const patch = game.terrain_patch();
+  if (patch.length) renderer.patchImage(assets.images.terrain, patch, game.terrain_patch_pixels());
   const fs = game.fog_stamp();
   if (fs !== fogStamp) {
     const size = game.fog_size();
@@ -721,6 +786,8 @@ function refresh() {
     writeStore("defaults", ui.save.defaults);
     writeStore("player", ui.save.player);
   }
+  // Match History: the core's own text, kept as given (TRIAGE row 88).
+  if (ui.save_history !== undefined) writeStore("history", ui.save_history);
   if (ui.navigate) window.location.href = ui.navigate;
   if (ui.sounds) ui.sounds.forEach(play);
   // Messages first: a Leave or Dissolve goes out before the transport closes.
@@ -732,6 +799,9 @@ function refresh() {
   const starting = inMatch && el("match").hidden;
   el("menus").hidden = inMatch;
   el("match").hidden = !inMatch;
+  const backgroundHidden = el("menu-background").hidden;
+  el("menu-background").hidden = inMatch;
+  if (!inMatch) drawMenuBackground(backgroundHidden);
   // Every new match gets a view the size of the window.
   if (starting) {
     overlayText = "";
@@ -766,10 +836,12 @@ async function start() {
   crypto.getRandomValues(entropy);
   game = new Game(strings, glossary, readStore("defaults"), readStore("player"), crypto.randomUUID(), entropy[0]);
   hints = JSON.parse(game.hints());
+  game.act("history.load", readStore("history"), false, false);
   // `?codes`: the pasted-code path (Invite Code, Reply Code), for the
   // automated online check only.
   if (new URLSearchParams(location.search).has("codes")) game.act("flag.codes", "on", false, false);
   assets = JSON.parse(render_assets());
+  el("tab-icon").href = assets.tab_icon;
   bindInput();
   refresh();
   document.body.dataset.ready = "true";
