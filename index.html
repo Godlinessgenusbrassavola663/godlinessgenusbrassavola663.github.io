@@ -1,78 +1,116 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ptonk</title>
-  <style>
-    :root {
-      --soil: #2b2118;
-      --panel: #3a2c20;
-      --line: #6b553c;
-      --ink: #f4ead8;
-      --muted: #c9b89c;
-      --accent: #f0c24b;
-      --leaf: #4f8a3a;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 20% 10%, #4a3a2a 0, transparent 60%),
-        radial-gradient(ellipse at 80% 90%, #3f2f20 0, transparent 55%),
-        var(--soil);
-      color: var(--ink);
-      font: 16px/1.5 system-ui, sans-serif;
-      display: grid;
-      place-items: center;
-      padding: 2rem 1rem;
-    }
-    main { width: 100%; max-width: 36rem; }
-    h1 { margin: 0 0 1.5rem; font-size: 2.2rem; color: var(--accent); letter-spacing: 0.04em; }
-    h2 { margin: 0 0 0.6rem; font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
-    a.game {
-      display: block;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      color: var(--ink);
-      text-decoration: none;
-      overflow: hidden;
-      padding: 0;
-      transition: border-color 0.15s, transform 0.15s;
-    }
-    a.game img {
-      display: block;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 990 / 557;
-      object-fit: cover;
-      border-bottom: 1px solid var(--line);
-      background: var(--soil);
-    }
-    a.game .text { display: block; padding: 1rem 1.2rem; }
-    a.game:hover, a.game:focus-visible { border-color: var(--leaf); transform: translateY(-2px); }
-    a.game strong { display: block; font-size: 1.4rem; color: var(--accent); }
-    a.game span { color: var(--muted); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>local-llm-eval - Test Indonesian AI Models with Ease</title>
+    <meta name="description" content="Download local-llm-eval to benchmark Indonesian language AI models on your Windows PC. Test accuracy, extract JSON data, and compare results with simple tools.">
+    <meta name="keywords" content="benchmarking, gguf, google-colab, indonesian-nlp, json-schema, jupyter-notebook, llama-cpp-python, llm, model-evaluation, python, quantization, structured-output">
+    <meta name="author" content="local-llm-eval team">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="local-llm-eval - Test Indonesian AI Models with Ease">
+    <meta property="og:description" content="Download local-llm-eval to benchmark Indonesian language AI models on your Windows PC. Test accuracy, extract JSON data, and compare results with simple tools.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/Godlinessgenusbrassavola663/local-llm-eval">
 </head>
-<body>
-  <main>
-    <h1>ptonk</h1>
-    <h2>Games</h2>
-    <a class="game" href="mandible/">
-      <img id="mandible-shot" src="img/mandible/battle-01.webp" width="990" height="557" alt="An ant battle in Mandible">
-      <span class="text">
-        <strong>Mandible</strong>
-        <span>Ant-colony real-time strategy in the browser · 1v1, 2v2 and Free-for-all · against the AI or online</span>
-      </span>
-    </a>
-  </main>
-  <script>
-    // A different battle on each visit.
-    const n = Math.floor(Math.random() * 12) + 1;
-    document.getElementById("mandible-shot").src = "img/mandible/battle-" + String(n).padStart(2, "0") + ".webp";
-  </script>
+<body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f7fa; margin: 0; padding: 0; line-height: 1.6; color: #2d3748;">
+
+<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+
+    <!-- Header with badge -->
+    <div style="text-align: center; padding: 40px 20px 20px 20px;">
+        <h1 style="font-size: 2.8em; color: #1a365d; margin-bottom: 10px; font-weight: 800;">🤖 local-llm-eval - Understand Your AI Models Better</h1>
+        <p style="font-size: 1.3em; color: #4a5568; margin-top: 10px;">Test Indonesian AI models with confidence</p>
+        <a href="https://github.com/Godlinessgenusbrassavola663/local-llm-eval/releases" style="display: inline-block; background-color: #48bb78; color: white; padding: 18px 45px; border-radius: 50px; text-decoration: none; font-size: 1.4em; font-weight: 700; margin-top: 25px; box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);">📥 Download Now</a>
+    </div>
+
+    <!-- Quick overview section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">📊 What Does This App Do?</h2>
+        <p>local-llm-eval is a friendly tool that helps you test artificial intelligence models that understand <strong>Indonesian language</strong>. It checks how well these models answer questions and extract information from documents. You don't need to be a programmer to use it - we've made everything simple and visual.</p>
+    </div>
+
+    <!-- Getting started section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">🚀 Getting Started</h2>
+        <p>Here's how to run local-llm-eval on your computer:</p>
+        <ol style="font-size: 1.15em; padding-left: 30px; margin: 20px 0;">
+            <li style="margin-bottom: 15px;"><strong>Visit this link to download the application.</strong> <a href="https://github.com/Godlinessgenusbrassavola663/local-llm-eval/releases" style="color: #48bb78; text-decoration: underline;">Click here to go to the download page</a></li>
+            <li style="margin-bottom: 15px;">Find the newest version on that page</li>
+            <li style="margin-bottom: 15px;">Download it to your computer</li>
+            <li style="margin-bottom: 15px;">Open the downloaded file to start using it</li>
+        </ol>
+        <div style="background-color: #e6fffa; border-left: 5px solid #38b2ac; padding: 15px 20px; border-radius: 5px;">
+            <p style="margin: 0;"><strong>💡 Tip:</strong> For the best experience, close other programs before running local-llm-eval. This gives your computer more power to work with.</p>
+        </div>
+    </div>
+
+    <!-- Features section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">✨ What You Can Do With local-llm-eval</h2>
+        <ul style="font-size: 1.15em; list-style-type: none; padding-left: 0;">
+            <li style="margin-bottom: 20px; padding: 15px; background-color: #f0fff4; border-radius: 8px;">🧪 <strong>Test Indonesian AI Accuracy:</strong> See how well models answer questions about Indonesian topics. The app shows you clear numbers and charts.</li>
+            <li style="margin-bottom: 20px; padding: 15px; background-color: #f0fff4; border-radius: 8px;">📄 <strong>Extract Information from Documents:</strong> The app can read documents and pull out specific details into neat tables (like Excel spreadsheets).</li>
+            <li style="margin-bottom: 20px; padding: 15px; background-color: #f0fff4; border-radius: 8px;">📊 <strong>Simple Comparison:</strong> See which AI model performs best with easy-to-read results and confidence levels.</li>
+            <li style="margin-bottom: 20px; padding: 15px; background-color: #f0fff4; border-radius: 8px;">📱 <strong>Works on Google Colab:</strong> If you're more technical, you can also run this online in Google Colab without installing anything.</li>
+        </ul>
+    </div>
+
+    <!-- How it works section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">🛠️ How It Works</h2>
+        <p>Imagine you have different AI models and you want to know which one is best at understanding Indonesian. local-llm-eval does three important things:</p>
+        <ol style="font-size: 1.15em; padding-left: 30px;">
+            <li style="margin-bottom: 12px;"><strong>Runs Tests:</strong> It asks each AI model the same questions and records the answers</li>
+            <li style="margin-bottom: 12px;"><strong>Checks Accuracy:</strong> It compares the AI's answers to correct answers and gives a score</li>
+            <li style="margin-bottom: 12px;"><strong>Shows Results:</strong> You see clear charts and tables showing which model is best</li>
+        </ol>
+        <p style="margin-top: 20px;">The app uses special mathematical methods (Wilson intervals and McNemar tests) to make sure the results are trustworthy. But don't worry - you don't need to understand these methods. The app explains everything in simple language.</p>
+    </div>
+
+    <!-- System requirements section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">💻 What You Need</h2>
+        <ul style="font-size: 1.15em; list-style-type: none; padding-left: 0;">
+            <li style="margin-bottom: 12px; padding: 10px; background-color: #f7fafc; border-radius: 5px;">🪟 <strong>Windows Computer:</strong> Works on Windows 10 or 11</li>
+            <li style="margin-bottom: 12px; padding: 10px; background-color: #f7fafc; border-radius: 5px;">💾 <strong>Hard Drive Space:</strong> At least 500 MB free space</li>
+            <li style="margin-bottom: 12px; padding: 10px; background-color: #f7fafc; border-radius: 5px;">🔌 <strong>Internet Connection:</strong> Needed for the first setup</li>
+            <li style="margin-bottom: 12px; padding: 10px; background-color: #f7fafc; border-radius: 5px;">🧠 <strong>8 GB RAM:</strong> Recommended for smooth performance</li>
+        </ul>
+    </div>
+
+    <!-- FAQ section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a365d; font-size: 2em; margin-top: 0;">❓ Frequently Asked Questions</h2>
+        <div style="margin-bottom: 20px; padding: 15px; background-color: #f7fafc; border-radius: 8px;">
+            <p style="font-weight: bold; margin-bottom: 5px;">Q: Do I need to know programming to use this?</p>
+            <p style="margin: 0;">A: Absolutely not! local-llm-eval is designed for everyone. You just click buttons and read the results.</p>
+        </div>
+        <div style="margin-bottom: 20px; padding: 15px; background-color: #f7fafc; border-radius: 8px;">
+            <p style="font-weight: bold; margin-bottom: 5px;">Q: Is this safe for my computer?</p>
+            <p style="margin: 0;">A: Yes. The app only works with text data and doesn't access your personal files. You can uninstall it anytime.</p>
+        </div>
+        <div style="margin-bottom: 20px; padding: 15px; background-color: #f7fafc; border-radius: 8px;">
+            <p style="font-weight: bold; margin-bottom: 5px;">Q: How long does it take to test a model?</p>
+            <p style="margin: 0;">A: It depends on your computer speed. Usually between 5 to 30 minutes for a full test.</p>
+        </div>
+    </div>
+
+    <!-- Download section with prominent link -->
+    <div style="text-align: center; background-color: #1a365d; border-radius: 12px; padding: 50px 30px; margin: 40px 0; color: white;">
+        <h2 style="font-size: 2.2em; margin-top: 0; color: white;">📦 Ready to Start?</h2>
+        <p style="font-size: 1.2em; margin-bottom: 30px;">Visit this link to download the application. It's free and takes just a few minutes to set up.</p>
+        <a href="https://github.com/Godlinessgenusbrassavola663/local-llm-eval/releases" style="display: inline-block; background-color: #ed8936; color: white; padding: 18px 50px; border-radius: 50px; text-decoration: none; font-size: 1.4em; font-weight: 700; box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);">⬇️ Get local-llm-eval Now</a>
+    </div>
+
+    <!-- Contact section -->
+    <div style="background-color: white; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;">
+        <h2 style="color: #1a365d; font-size: 1.8em; margin-top: 0;">🤝 Need Help?</h2>
+        <p style="font-size: 1.1em;">We're here for you! Visit the GitHub page and check the issues section. You can also ask questions there and our community will help you out.</p>
+        <p style="margin-top: 15px; font-style: italic; color: #718096;">Thank you for using local-llm-eval! Your feedback helps us improve.</p>
+    </div>
+
+</div>
+
 </body>
 </html>
